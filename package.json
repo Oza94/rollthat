@@ -1,0 +1,27 @@
+{
+  "name": "rollthat",
+  "version": "0.1.0",
+  "description": "An library to generate random stuff",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "rollup -c rollup.config.js",
+    "postbuild": "for f in package.json README.md; do cp $f ./dist/$f; done",
+    "pub": "",
+    "test": "jest src"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "7.14.8",
+    "@babel/preset-env": "7.14.8",
+    "@babel/preset-typescript": "7.14.5",
+    "@rollup/plugin-typescript": "8.2.4",
+    "@types/jest": "26.0.24",
+    "babel-jest": "27.0.6",
+    "jest": "27.0.6",
+    "rollup": "2.55.1",
+    "tslib": "2.3.0",
+    "typescript": "4.3.5"
+  }
+}
