@@ -7,7 +7,7 @@
     "prebuild": "rm -rf dist",
     "build": "rollup -c rollup.config.js",
     "postbuild": "for f in package.json README.md; do cp $f ./dist/$f; done",
-    "pub": "",
+    "pub": "cd dist && npm publish && cd ..",
     "test": "jest src"
   },
   "author": "",
