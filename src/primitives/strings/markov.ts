@@ -1,5 +1,5 @@
-import { randomItemWeighted } from "../objects/lists";
-import { MarkovModel, RandomFunc, WeightedListTuple } from "../types";
+import { randomItemWeighted } from "../../objects/lists";
+import { MarkovModel, RandomFunc } from "../../types";
 
 export const MARKOV_STARTTOK = "@@_";
 export const MARKOV_ENDTOK = "_@@";

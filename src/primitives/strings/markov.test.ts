@@ -1,4 +1,4 @@
-import { randomInt } from "./numbers";
+import { randomInt } from "./../numbers";
 import {
   buildMarkovModel,
   markovString,
@@ -6,9 +6,9 @@ import {
   MARKOV_ENDTOK,
   MARKOV_STARTTOK,
   rawMarkovString,
-} from "./strings";
+} from "./markov";
 
-jest.mock("./numbers");
+jest.mock("./../numbers");
 
 const randomIntMock = randomInt as jest.Mock;
 
