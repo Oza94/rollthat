@@ -15,3 +15,10 @@ export type WeightedList<T> = {
   total: number;
   items: WeightedListTuple<T>[];
 };
+
+export type MarkovModel = {
+  separator: string;
+  tokens: {
+    [token: string]: WeightedList<string>;
+  };
+};

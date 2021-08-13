@@ -28,6 +28,18 @@ describe("randomItem()", () => {
       expect(randomItem(listMock)).toBe("three");
       expect(randomItem(listMock)).toBe("two");
     });
+
+    test("should return element from list except excluded", () => {
+      randomIntMock.mockReturnValueOnce(0).mockReturnValue(2);
+
+      expect(randomItem(listMock, { exclude: ["one"] })).toBe("two");
+      expect(randomItem(listMock, { exclude: ["three"] })).toBe("one");
+    });
+
+    test("should error if all list values are excluded", () => {
+      expect(() => randomItem(listMock, { exclude: ["one", "two", "three"] }))
+        .toThrow;
+    });
   });
 
   describe("weighted", () => {
@@ -40,6 +52,21 @@ describe("randomItem()", () => {
       expect(randomItem(weightedListMock)).toBe("one");
       expect(randomItem(weightedListMock)).toBe("three");
       expect(randomItem(weightedListMock)).toBe("two");
+    });
+
+    test("should return element from weighted list", () => {
+      randomIntMock.mockReturnValueOnce(0).mockReturnValueOnce(5);
+
+      expect(randomItem(weightedListMock, { exclude: ["one"] })).toBe("two");
+      expect(randomItem(weightedListMock, { exclude: ["three"] })).toBe("one");
+    });
+
+    test("should return element from weighted list", () => {
+      randomIntMock.mockReturnValueOnce(0);
+
+      expect(() =>
+        randomItem(weightedListMock, { exclude: ["one", "two", "three"] })
+      ).toThrow();
     });
   });
 });

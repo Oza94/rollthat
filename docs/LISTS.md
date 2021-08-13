@@ -20,8 +20,12 @@ In this list, "Sunny" has `50%`chances to be picked, "Rain" `30%`, "Fog" and "St
 
 Pick a random item from `list`.
 
+If `options.exclude` is provided, these values will cause a new random roll.
+
+> **Throw** : If `exclude` contains the whole input `list`, this function throws.
+
 ```typescript
-function randomItem<T>(list: T[] | WeightedList<T>, rand: RandomFunc): T
+function randomItem<T>(list: T[] | WeightedList<T>, options: { rand?: RandomFunc, exclude: T[] }): T
 ```
 
 Example :
@@ -35,14 +39,17 @@ randomItem(["apple", "banana", "orange"]);
 
 Pick `count` random items from `list`. 
 
-If `options.uniq` is `true` (defaults to false), the returned list is composed of uniq items. In this case, throws if `count > list.length`.
+If `options.uniq` is `true` (defaults to false), the returned list is composed of uniq items. 
+
+If `options.exclude` is provided, these values will cause a new random roll.
+
+> **Throw** : If `count > list.length` and `uniq` is provided, the function is unable to get more random values than the input list can provide. The same applies if `exclude.length + count > list.length`, given that all `exclude` are included in the input `list`.
 
 ```typescript
 function randomItems<T>(
   list: T[] | WeightedList<T>, 
   count: number, 
-  options: { uniq: boolean }, 
-  rand: RandomFunc
+  options: { uniq: boolean; rand?: RandomFunc; exclude: T[] }, 
 ): T[]
 ```
 

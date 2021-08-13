@@ -25,6 +25,21 @@ type MultiRollResult = {
 };
 ```
 
+## Markov
+
+### `MarkovModel`
+
+Represents a markov string generator model.
+
+```typescript
+export type MarkovModel = {
+  separator: string;
+  tokens: {
+    [token: string]: WeightedList<string>;
+  };
+};
+```
+
 ## Weighted lists
 
 ### `WeightedList` 

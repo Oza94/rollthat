@@ -7,6 +7,16 @@ import {
   WeightFunc,
 } from "../types";
 
+export type RandomItemOptions<T> = { exclude?: T[]; rand?: RandomFunc };
+
+export type RandomItemsOptions<T> = {
+  exclude?: T[];
+  uniq?: boolean;
+  rand?: RandomFunc;
+};
+
+const DEFAULT_RAND_ITEM_OPTS = { rand: Math.random };
+
 export function isWeightedList<T>(value: List<T>): value is WeightedList<T> {
   if (Array.isArray(value)) {
     return false;
@@ -16,22 +26,35 @@ export function isWeightedList<T>(value: List<T>): value is WeightedList<T> {
   return false;
 }
 
-export function randomItem<T>(list: List<T>, r: RandomFunc = Math.random): T {
+export function randomItem<T>(
+  list: List<T>,
+  { exclude, rand }: RandomItemOptions<T> = DEFAULT_RAND_ITEM_OPTS
+): T {
   if (isWeightedList(list)) {
-    return randomItemWeighted(list, r);
+    return randomItemWeighted(list, { exclude, rand });
   }
-  return list[randomInt(0, list.length, r)];
+  let index = randomInt(0, list.length, rand);
+  let excludeCount = 0;
+  while (exclude && exclude.includes(list[index])) {
+    index = (index + 1) % list.length;
+    excludeCount += 1;
+    if (excludeCount >= list.length) {
+      throw new Error(
+        `Cannot get random item because all list values are excluded.`
+      );
+    }
+  }
+  return list[index];
 }
 
 export function randomItemIndexWeighted<T>(
   list: WeightedList<T>,
-  r: RandomFunc = Math.random
+  rand: RandomFunc = Math.random
 ): number {
-  let rand = randomInt(0, list.total + 1, r);
+  let randInt = randomInt(0, list.total + 1, rand);
   let i = 0;
-
-  while (rand >= list.items[i].weight) {
-    rand -= list.items[i].weight;
+  while (randInt >= list.items[i].weight) {
+    randInt -= list.items[i].weight;
     i += 1;
   }
 
@@ -40,35 +63,45 @@ export function randomItemIndexWeighted<T>(
 
 export function randomItemWeighted<T>(
   list: WeightedList<T>,
-  r: RandomFunc = Math.random
+  { exclude, rand }: RandomItemOptions<T> = DEFAULT_RAND_ITEM_OPTS
 ): T {
-  return list.items[randomItemIndexWeighted(list, r)].value;
+  let index = randomItemIndexWeighted(list, rand);
+  let excludeCount = 0;
+  while (exclude && exclude.includes(list.items[index].value)) {
+    index = (index + 1) % list.items.length;
+    excludeCount += 1;
+    if (excludeCount >= list.items.length) {
+      throw new Error(
+        `Cannot get random item because all list values are excluded.`
+      );
+    }
+  }
+  return list.items[index].value;
 }
 
 export function randomItems<T>(
   list: List<T>,
   count: number,
-  { uniq = false }: { uniq: boolean } = { uniq: false },
-  r: RandomFunc = Math.random
+  { rand, uniq, exclude }: RandomItemsOptions<T> = DEFAULT_RAND_ITEM_OPTS
 ) {
   if (isWeightedList(list)) {
-    return randomItemsWeighted(list, count, { uniq }, r);
+    return randomItemsWeighted(list, count, { uniq, rand });
   }
 
   if (uniq && count > list.length) {
     throw new Error(
-      `Can't get ${count} random item(s) from a list with length=${list.length}`
+      `Can't get ${count} uniq random item(s) from a list with length=${list.length}`
     );
   }
 
   const result: T[] = [];
 
   while (result.length < count) {
-    let i = randomInt(0, result.length, r);
-    while (uniq && result.includes(list[i])) {
-      i = (i + 1) % list.length;
-    }
-    result.push(list[i]);
+    result.push(
+      randomItem(list, {
+        exclude: uniq ? (exclude ? exclude.concat(result) : result) : undefined,
+      })
+    );
   }
 
   return result;
@@ -77,8 +110,7 @@ export function randomItems<T>(
 export function randomItemsWeighted<T>(
   list: WeightedList<T>,
   count: number,
-  { uniq = false }: { uniq: boolean } = { uniq: false },
-  r: RandomFunc = Math.random
+  { rand, uniq, exclude }: RandomItemsOptions<T> = DEFAULT_RAND_ITEM_OPTS
 ): T[] {
   if (uniq && count > list.items.length) {
     throw new Error(
@@ -89,11 +121,12 @@ export function randomItemsWeighted<T>(
   const result: T[] = [];
 
   while (result.length < count) {
-    let i = randomItemIndexWeighted(list, r);
-    while (uniq && result.includes(list.items[i].value)) {
-      i = (i + 1) % list.items.length;
-    }
-    result.push(list.items[i].value);
+    result.push(
+      randomItemWeighted(list, {
+        exclude: uniq ? (exclude ? exclude.concat(result) : result) : undefined,
+        rand,
+      })
+    );
   }
 
   return result;
