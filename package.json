@@ -3,6 +3,7 @@
   "version": "1.1.1",
   "description": "An library to generate random stuff",
   "main": "index.js",
+  "module": "index.js",
   "sideEffects": false,
   "scripts": {
     "prebuild": "rm -rf dist",
