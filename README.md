@@ -6,7 +6,7 @@
 ![Tree-Shaking Badge](https://badgen.net/bundlephobia/tree-shaking/rollthat)
 ![Types Badges](https://badgen.net/npm/types/rollthat)
 
-A TypeScript library to generate random stuff : numbers, strings and more.
+A TypeScript library to generate random stuff : numbers, strings and more. Also provide some utility stuff to work with strings.
 
 ## Install
 
@@ -18,6 +18,7 @@ See `docs/` folder for API usage :
 
 - Typescript types : [Types](docs/TYPES.md)
 - Numbers, dices : [Primitives](docs/PRIMITIVES.md)
+- Strings : [Strings](docs/STRINGS.md)
 - Lists of items : [Lists](docs/LISTS.md)
 - Markov strings : [Markov](docs/MARKOV.md)
 
