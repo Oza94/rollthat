@@ -17,3 +17,14 @@ const weightedNames = createWeightedList(names, name => levenshtein(father));
 // Names with a short distance from father's name have a higher chance to appear
 const sonsNames = randomItems(weightedNames, 3, { uniq: true });
 ```
+
+## Markov model based on syllables
+
+```typescript
+import { buildMarkovModel, splitBySyllablesFrench } from 'rollthat';
+
+const names = ['Thorin', 'Durin', 'Balin', 'Oin' /* ... */];
+
+// Build a markov model based on syllables rather than individual letters.
+const model = buildMarkovModel(names, { splitInput: splitBySyllablesFrench });
+```

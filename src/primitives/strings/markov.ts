@@ -4,18 +4,25 @@ import { MarkovModel, RandomFunc } from "../../types";
 export const MARKOV_STARTTOK = "@@_";
 export const MARKOV_ENDTOK = "_@@";
 
+export type SplitTokenFunc = (input: string) => string[];
+
 export function buildMarkovModel(
   inputs: string[],
-  separator: string = " "
+  {
+    separator = " ",
+    splitInput,
+  }: { separator?: string; splitInput?: SplitTokenFunc } = { separator: " " }
 ): MarkovModel {
   const model: MarkovModel = {
     tokens: {},
     separator,
   };
 
+  const split = splitInput || ((input: string) => input.split(separator));
+
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
-    const tokens = input.split(separator);
+    const tokens = split(input);
     for (let t = 0; t < tokens.length + 1; t++) {
       const token = t < tokens.length ? tokens[t] : MARKOV_ENDTOK;
       const prevToken = t > 0 ? tokens[t - 1] : MARKOV_STARTTOK;

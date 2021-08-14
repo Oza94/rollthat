@@ -7,6 +7,13 @@ import {
   MARKOV_STARTTOK,
   rawMarkovString,
 } from "./markov";
+import {
+  dataset1BisMock,
+  dataset1Mock,
+  dataset2Mock,
+  model1Mock,
+  model2Mock,
+} from "./markov.mocks";
 
 jest.mock("./../numbers");
 
@@ -14,173 +21,23 @@ const randomIntMock = randomInt as jest.Mock;
 
 describe("buildMarkovModal()", () => {
   test("should build a markov model", () => {
-    expect(
-      buildMarkovModel(["a good start", "the good start", "a good end"])
-    ).toEqual({
-      tokens: {
-        [MARKOV_STARTTOK]: {
-          total: 3,
-          items: [
-            { value: "a", weight: 2 },
-            { value: "the", weight: 1 },
-          ],
-        },
-        a: {
-          total: 2,
-          items: [{ value: "good", weight: 2 }],
-        },
-        the: {
-          total: 1,
-          items: [{ value: "good", weight: 1 }],
-        },
-        good: {
-          total: 3,
-          items: [
-            { value: "start", weight: 2 },
-            { value: "end", weight: 1 },
-          ],
-        },
-        start: {
-          total: 2,
-          items: [{ value: MARKOV_ENDTOK, weight: 2 }],
-        },
-        end: {
-          total: 1,
-          items: [{ value: MARKOV_ENDTOK, weight: 1 }],
-        },
-      },
-      separator: " ",
-    });
+    expect(buildMarkovModel(dataset1Mock)).toEqual(model1Mock);
   });
 
   test("should build a markov with custom separator", () => {
-    expect(buildMarkovModel(["banana", "ananas"], "")).toEqual({
-      separator: "",
-      tokens: {
-        [MARKOV_STARTTOK]: {
-          items: [
-            {
-              value: "b",
-              weight: 1,
-            },
-            {
-              value: "a",
-              weight: 1,
-            },
-          ],
-          total: 2,
-        },
-        a: {
-          items: [
-            {
-              value: "n",
-              weight: 4,
-            },
-            {
-              value: MARKOV_ENDTOK,
-              weight: 1,
-            },
-            {
-              value: "s",
-              weight: 1,
-            },
-          ],
-          total: 6,
-        },
-        b: {
-          items: [
-            {
-              value: "a",
-              weight: 1,
-            },
-          ],
-          total: 1,
-        },
-        n: {
-          items: [
-            {
-              value: "a",
-              weight: 4,
-            },
-          ],
-          total: 4,
-        },
-        s: {
-          items: [
-            {
-              value: MARKOV_ENDTOK,
-              weight: 1,
-            },
-          ],
-          total: 1,
-        },
-      },
-    });
+    expect(buildMarkovModel(dataset2Mock, { separator: "" })).toEqual(
+      model2Mock
+    );
+  });
+
+  test("should build a markov with custom splitToken func", () => {
+    expect(
+      buildMarkovModel(dataset1BisMock, {
+        splitInput: (token) => token.split(/[0-9]+/g),
+      })
+    ).toEqual(model1Mock);
   });
 });
-
-const model = {
-  separator: "",
-  tokens: {
-    [MARKOV_STARTTOK]: {
-      items: [
-        {
-          value: "b",
-          weight: 1,
-        },
-        {
-          value: "a",
-          weight: 1,
-        },
-      ],
-      total: 2,
-    },
-    a: {
-      items: [
-        {
-          value: "n",
-          weight: 4,
-        },
-        {
-          value: MARKOV_ENDTOK,
-          weight: 1,
-        },
-        {
-          value: "s",
-          weight: 1,
-        },
-      ],
-      total: 6,
-    },
-    b: {
-      items: [
-        {
-          value: "a",
-          weight: 1,
-        },
-      ],
-      total: 1,
-    },
-    n: {
-      items: [
-        {
-          value: "a",
-          weight: 4,
-        },
-      ],
-      total: 4,
-    },
-    s: {
-      items: [
-        {
-          value: MARKOV_ENDTOK,
-          weight: 1,
-        },
-      ],
-      total: 1,
-    },
-  },
-};
 
 describe("rawMarkovString()", () => {
   test('should generate "bas"', () => {
@@ -190,13 +47,13 @@ describe("rawMarkovString()", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
-    expect(rawMarkovString(model)).toBe("bas");
+    expect(rawMarkovString(model2Mock)).toBe("bas");
   });
 
   test("should throw when stuck in infinite loop", () => {
     randomIntMock.mockReturnValueOnce(0);
 
-    expect(() => rawMarkovString(model)).toThrow();
+    expect(() => rawMarkovString(model2Mock)).toThrow();
   });
 
   test('should generate "bas" since minimum = 3', () => {
@@ -206,7 +63,7 @@ describe("rawMarkovString()", () => {
       .mockReturnValueOnce(4)
       .mockReturnValueOnce(0);
 
-    expect(rawMarkovString(model, { min: 3 })).toBe("bas");
+    expect(rawMarkovString(model2Mock, { min: 3 })).toBe("bas");
   });
 
   test("should throw when it fails to respect minimum length", () => {
@@ -216,7 +73,7 @@ describe("rawMarkovString()", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
-    expect(() => rawMarkovString(model, { min: 5 })).toThrow();
+    expect(() => rawMarkovString(model2Mock, { min: 5 })).toThrow();
   });
 });
 
@@ -228,13 +85,13 @@ describe("markovString()", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
-    expect(markovString(model)).toBe("bas");
+    expect(markovString(model2Mock)).toBe("bas");
   });
 
   test("should return null when it fails to generate a string", () => {
     randomIntMock.mockReturnValue(0);
 
-    expect(markovString(model)).toBe(null);
+    expect(markovString(model2Mock)).toBe(null);
   });
 
   test('should generate "bas" since minimum = 3', () => {
@@ -244,7 +101,7 @@ describe("markovString()", () => {
       .mockReturnValueOnce(4)
       .mockReturnValueOnce(0);
 
-    expect(markovString(model, { min: 3 })).toBe("bas");
+    expect(markovString(model2Mock, { min: 3 })).toBe("bas");
   });
 
   test("should retry to respect maximum", () => {
@@ -257,7 +114,7 @@ describe("markovString()", () => {
       .mockReturnValueOnce(0)
       .mockReturnValueOnce(4);
 
-    expect(markovString(model, { max: 2 })).toBe("ba");
+    expect(markovString(model2Mock, { max: 2 })).toBe("ba");
   });
 
   test("should exclude given result from input", () => {
@@ -270,13 +127,13 @@ describe("markovString()", () => {
       .mockReturnValueOnce(0)
       .mockReturnValueOnce(4);
 
-    expect(markovString(model, { exclude: ["bas"] })).toEqual("ba");
+    expect(markovString(model2Mock, { exclude: ["bas"] })).toEqual("ba");
   });
 
   test("should throw if throwOnMaxTries is true", () => {
     randomIntMock.mockReturnValue(0);
 
-    expect(() => markovString(model, { throwOnMaxTries: true })).toThrow();
+    expect(() => markovString(model2Mock, { throwOnMaxTries: true })).toThrow();
   });
 });
 
@@ -292,7 +149,7 @@ describe("markovStrings()", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
-    expect(markovStrings(model, 2)).toEqual(["bas", "bas"]);
+    expect(markovStrings(model2Mock, 2)).toEqual(["bas", "bas"]);
   });
 
   test("should generate one string with uniq = true", () => {
@@ -306,7 +163,7 @@ describe("markovStrings()", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
-    expect(markovStrings(model, 2, { uniq: true })).toEqual(["bas"]);
+    expect(markovStrings(model2Mock, 2, { uniq: true })).toEqual(["bas"]);
   });
 
   test("should generate rerty when not uniq", () => {
@@ -323,7 +180,7 @@ describe("markovStrings()", () => {
       .mockReturnValueOnce(0)
       .mockReturnValueOnce(4);
 
-    expect(markovStrings(model, 2, { uniq: true })).toEqual(["bas", "ba"]);
+    expect(markovStrings(model2Mock, 2, { uniq: true })).toEqual(["bas", "ba"]);
   });
 
   test("should exclude given result from input", () => {
@@ -336,20 +193,22 @@ describe("markovStrings()", () => {
       .mockReturnValueOnce(0)
       .mockReturnValueOnce(4);
 
-    expect(markovStrings(model, 1, { uniq: true, exclude: ["bas"] })).toEqual([
-      "ba",
-    ]);
+    expect(
+      markovStrings(model2Mock, 1, { uniq: true, exclude: ["bas"] })
+    ).toEqual(["ba"]);
   });
 
   test("should generate zero strings if generation fails", () => {
     randomIntMock.mockReturnValue(0);
 
-    expect(markovStrings(model, 2)).toEqual([]);
+    expect(markovStrings(model2Mock, 2)).toEqual([]);
   });
 
   test("should throw if generation fails", () => {
     randomIntMock.mockReturnValue(0);
 
-    expect(() => markovStrings(model, 2, { throwOnMaxTries: true })).toThrow();
+    expect(() =>
+      markovStrings(model2Mock, 2, { throwOnMaxTries: true })
+    ).toThrow();
   });
 });

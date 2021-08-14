@@ -4,10 +4,13 @@ Utility to generate [Markov](https://en.wikipedia.org/wiki/Markov_chain) models 
 
 ## `buildMarkovModel()`
 
-Generates a markov model using input strings and given separator.
+Generates a markov model using input strings and given separator (default to `" "`). You can also provide a `splitInput` function that can implement more complex splitting behavior.
 
 ```typescript
-function buildMarkovModel(inputs: string[], separator: string = " "): MarkovModel
+function buildMarkovModel(inputs: string[], options: {
+  separator: string;
+  splitInput:  (input: string) => string[];
+}): MarkovModel
 ```
 
 See : 
